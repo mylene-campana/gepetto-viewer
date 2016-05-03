@@ -69,6 +69,9 @@ namespace graphics {
       main_camera_->setDrawBuffer(buffer);
       main_camera_->setReadBuffer(buffer);
 
+      // change background color
+      main_camera_->setClearColor(osg::Vec4(0.9f,0.9f,0.9f,0.0f)); //white
+
       /* add camera to the viewer */
       viewer_ptr_->setSceneData ( scene_ptr_->asGroup() );
       viewer_ptr_->setKeyEventSetsDone (0);

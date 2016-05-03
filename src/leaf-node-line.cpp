@@ -47,7 +47,7 @@ namespace graphics {
         
         /* Set a default line width */
         osg::LineWidth* linewidth = new osg::LineWidth();
-        linewidth->setWidth(1.0f);
+        linewidth->setWidth(4.0f);
         beam_ptr_->getOrCreateStateSet()->setAttributeAndModes(linewidth, osg::StateAttribute::ON);
     }
     
