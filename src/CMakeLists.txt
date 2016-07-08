@@ -26,6 +26,7 @@ SET(${LIBRARY_NAME}_SOURCES
   leaf-node-line.cpp
   leaf-node-box.cpp
   leaf-node-cylinder.cpp
+  leaf-node-circle.cpp
   leaf-node-cone.cpp
   leaf-node-face.cpp
   leaf-node-sphere.cpp
