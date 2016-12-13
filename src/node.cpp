@@ -505,11 +505,12 @@ namespace graphics {
     return std::make_pair(auto_transform_ptr_->getPosition(),auto_transform_ptr_->getRotation());
   }
 
-  void Node::accept (NodeVisitor& nv) {
-    nv.apply (*this);
+  void Node::traverse (NodeVisitor& /*visitor*/) {
   }
 
-  void Node::traverse (NodeVisitor& /*visitor*/) {
+  osg::ref_ptr<osg::Node> Node::getOsgNode() const
+  {
+    return geode_ptr_.get();
   }
 
   /* End of declaration of public function members */

@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 LAAS-CNRS. All rights reserved.
 //
 
+#include <sys/stat.h>
 #include <fstream>
 #include <ios>
 #include <gepetto/viewer/leaf-node-collada.h>
@@ -16,14 +17,21 @@ namespace graphics {
 
   void LeafNodeCollada::init()
   {
-    // get the extension of the meshs file
-    std::string ext = collada_file_path_.substr(collada_file_path_.find_last_of(".")+1,collada_file_path_.size());
-    if(ext == "obj"){
-      const osgDB::Options* options = new osgDB::Options("noRotation");
-      collada_ptr_ = osgDB::readNodeFile(collada_file_path_,options);
+    std::string osgname = collada_file_path_ + ".osg";
+    struct stat buffer;
+    if (stat (osgname.c_str(), &buffer) == 0) {
+      std::cout << "Using " << osgname << "\n";
+      collada_ptr_ = osgDB::readNodeFile(osgname);
+    } else {
+      // get the extension of the meshs file
+      std::string ext = collada_file_path_.substr(collada_file_path_.find_last_of(".")+1,collada_file_path_.size());
+      if(ext == "obj"){
+        const osgDB::Options* options = new osgDB::Options("noRotation");
+        collada_ptr_ = osgDB::readNodeFile(collada_file_path_,options);
       }
-    else
-      collada_ptr_ = osgDB::readNodeFile(collada_file_path_);
+      else
+        collada_ptr_ = osgDB::readNodeFile(collada_file_path_);
+    }
         
     /* Create PositionAttitudeTransform */
     this->asQueue()->addChild(collada_ptr_);
@@ -158,6 +166,7 @@ namespace graphics {
  
   void LeafNodeCollada::setTexture(const std::string& image_path)
   {
+    texture_file_path_ = image_path;
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
     texture->setDataVariance(osg::Object::DYNAMIC); 
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(image_path);
@@ -168,6 +177,16 @@ namespace graphics {
     } 
     texture->setImage(image);
     collada_ptr_->getStateSet()->setTextureAttributeAndModes(0,texture,osg::StateAttribute::ON);
+  }
+
+  const std::string& LeafNodeCollada::meshFilePath () const
+  {
+    return collada_file_path_;
+  }
+
+  const std::string& LeafNodeCollada::textureFilePath () const
+  {
+    return texture_file_path_;
   }
 
   /*void LeafNodeCollada::setColor(osg::NodeRefPtr osgNode_ptr,const osgVector4& color)
@@ -193,6 +212,11 @@ namespace graphics {
       }
     }
   }*/
+
+  osg::ref_ptr<osg::Node> LeafNodeCollada::getOsgNode() const
+  {
+    return collada_ptr_;
+  }
 
   LeafNodeCollada::~LeafNodeCollada()
   {

@@ -26,6 +26,7 @@ SET(${LIBRARY_NAME}_SOURCES
   leaf-node-line.cpp
   leaf-node-box.cpp
   leaf-node-cylinder.cpp
+  leaf-node-circle.cpp
   leaf-node-cone.cpp
   leaf-node-face.cpp
   leaf-node-sphere.cpp
@@ -40,6 +41,7 @@ SET(${LIBRARY_NAME}_SOURCES
   node-rod.cpp
   node-visitor.cc
   transform-writer.cc
+  blender-geom-writer.cc
   OSGManipulator/keyboard-manipulator.cpp
 )
 

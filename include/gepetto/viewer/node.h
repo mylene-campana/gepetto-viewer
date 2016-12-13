@@ -10,10 +10,10 @@
 #define SCENEVIEWER_NODE_HH
 
 #include <iostream>
+#include <gepetto/viewer/node-visitor.h>
 #include <gepetto/viewer/config-osg.h>
 
 namespace graphics {
-    class NodeVisitor;
     
     DEF_CLASS_SMART_PTR(Node)
     
@@ -72,7 +72,7 @@ namespace graphics {
         {
             return static_auto_transform_ptr_;
         }
-        
+
         void setID (const std::string& id_name)
         {
             id_name_ = id_name;
@@ -152,6 +152,8 @@ namespace graphics {
             int arrows = ROT_X | ROT_Y | ROT_Z | TRANS_X | TRANS_Y | TRANS_Z);
 
         virtual void setArrowsVisibility (const VisibilityMode& visibility);
+
+	virtual osg::ref_ptr<osg::Node> getOsgNode() const;
         
         /**
          \brief Return the root node to include it in the scene
@@ -181,7 +183,7 @@ namespace graphics {
         virtual void setAlpha (const float& alpha);
 	float getAlpha() const;
 
-        virtual void accept (NodeVisitor& visitor);
+        SCENE_VIEWER_ACCEPT_VISITOR;
         virtual void traverse (NodeVisitor& visitor);
 
         /* Destructor */

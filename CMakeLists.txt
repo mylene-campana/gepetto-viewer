@@ -54,6 +54,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/gepetto/viewer/leaf-node-sphere.h
   include/gepetto/viewer/leaf-node-light.h
   include/gepetto/viewer/leaf-node-arrow.h
+  include/gepetto/viewer/leaf-node-circle.h
   include/gepetto/viewer/macros.h
   include/gepetto/viewer/node.h
   include/gepetto/viewer/urdf-parser.h
@@ -63,6 +64,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/gepetto/viewer/node-rod.h
   include/gepetto/viewer/node-visitor.h
   include/gepetto/viewer/transform-writer.h
+  include/gepetto/viewer/blender-geom-writer.h
   include/gepetto/viewer/OSGManipulator/keyboard-manipulator.h
 )
 

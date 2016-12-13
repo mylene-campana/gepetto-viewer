@@ -10,11 +10,22 @@
 
 #include <osg/Camera>
 #include <gepetto/viewer/OSGManipulator/keyboard-manipulator.h>
-#include <osgGA/KeySwitchMatrixManipulator>
 #include <osgGA/TrackballManipulator>
+#include <osgGA/NodeTrackerManipulator>
 #include <osgDB/WriteFile>
 
 namespace graphics {
+
+    void WindowManager::createManipulator()
+    {
+      osgViewer::Viewer::Windows windows;
+      viewer_ptr_->getWindows(windows);
+      manipulator_ptr = new ::osgGA::KeySwitchMatrixManipulator;
+      manipulator_ptr->addNumberedMatrixManipulator(new ::osgGA::TrackballManipulator);
+      manipulator_ptr->addNumberedMatrixManipulator(new ::osgGA::KeyboardManipulator(windows.front()));
+      manipulator_ptr->addNumberedMatrixManipulator(new ::osgGA::NodeTrackerManipulator);
+      viewer_ptr_->setCameraManipulator( manipulator_ptr);      
+    }
 
     /* Declaration of private function members */
     void WindowManager::init(const unsigned int& x,
@@ -76,13 +87,7 @@ namespace graphics {
       viewer_ptr_->setSceneData ( scene_ptr_->asGroup() );
       viewer_ptr_->setKeyEventSetsDone (0);
       viewer_ptr_->addEventHandler(new osgViewer::HelpHandler);
-
-      osgViewer::Viewer::Windows windows;
-      viewer_ptr_->getWindows(windows);
-      osgGA::KeySwitchMatrixManipulator *manipulator_ptr = new ::osgGA::KeySwitchMatrixManipulator;
-      manipulator_ptr->addNumberedMatrixManipulator(new ::osgGA::TrackballManipulator);
-      manipulator_ptr->addNumberedMatrixManipulator(new ::osgGA::KeyboardManipulator(windows.front()));
-      viewer_ptr_->setCameraManipulator( manipulator_ptr);
+      createManipulator();
     }
 
     void WindowManager::init(osgViewer::Viewer* v, osg::GraphicsContext* gc)
@@ -97,19 +102,20 @@ namespace graphics {
         main_camera_ = viewer_ptr_->getCamera ();
 
         gc_ = osg::GraphicsContextRefPtr (gc);
+	createManipulator();
     }
 
-    WindowManager::WindowManager ()
+    WindowManager::WindowManager () : nodeTrackerManipulatorIndex(2)
     {
         init (0, 0, DEF_WIDTH_WINDOW, DEF_HEIGHT_WINDOW);
     }
 
-    WindowManager::WindowManager (osg::GraphicsContext* gc)
+    WindowManager::WindowManager (osg::GraphicsContext* gc) : nodeTrackerManipulatorIndex(2)
     {
         init (gc);
     }
 
-    WindowManager::WindowManager (osgViewer::Viewer* v, osg::GraphicsContext* gc)
+    WindowManager::WindowManager (osgViewer::Viewer* v, osg::GraphicsContext* gc) : nodeTrackerManipulatorIndex(2)
     {
         init (v, gc);
     }
@@ -117,12 +123,12 @@ namespace graphics {
     WindowManager::WindowManager (const unsigned int& x,
                                             const unsigned int& y,
                                             const unsigned int& width,
-                                            const unsigned int& height)
+                                            const unsigned int& height) : nodeTrackerManipulatorIndex(2)
     {
         init (x, y, width, height);
     }
 
-    WindowManager::WindowManager (const WindowManager& other)
+    WindowManager::WindowManager (const WindowManager& other) : nodeTrackerManipulatorIndex(2)
     {
       init ((unsigned int) other.getWindowPosition().x(),
 	    (unsigned int) other.getWindowPosition().y(),
@@ -311,6 +317,32 @@ namespace graphics {
         options.get());
   }
 
+  void WindowManager::attachCameraToNode(Node* node)
+  {
+    osgGA::NodeTrackerManipulator* manip
+      = dynamic_cast<osgGA::NodeTrackerManipulator*>
+      (manipulator_ptr->getMatrixManipulatorWithIndex(nodeTrackerManipulatorIndex));
+
+    if (manip)
+      {
+	manip->setTrackNode(node->getOsgNode().get());
+	// manip->setRotationMode(osgGA::NodeTrackerManipulator::TRACKBALL);
+	manip->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+	manipulator_ptr->selectMatrixManipulator(nodeTrackerManipulatorIndex);
+      }
+    else
+      std::cout << "Unexpected manipulator in viewer" << std::endl;
+  }
+
+  void WindowManager::detachCamera()
+  {
+    manipulator_ptr->selectMatrixManipulator(0);
+  }
+  
+  void WindowManager::setBackgroundColor(osg::Vec4 color){
+    viewer_ptr_->getCamera()->setClearColor(color);
+  }
+      
     /* End declaration of public function members */
 
 } /* namespace graphics */
